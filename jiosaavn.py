@@ -41,10 +41,11 @@ def clear() -> None:
 
 
 class Jiosaavn:
-    def __init__(self, add_numbers=False, download_cover=False) -> None:
+    def __init__(self, add_numbers=False, download_cover=False, output_dir="Downloads") -> None:
         self.session = requests.Session()
         self.add_numbers = add_numbers
         self.download_cover = download_cover
+        self.output_dir = output_dir
 
     # Tags metadata to a track
     def tagger(self, json, song_path, album_artist, album_path, pos=1, total=1):
@@ -136,8 +137,8 @@ class Jiosaavn:
             folder_name = f"{primary_artists if primary_artists.count(',') < 2 else 'Various Artists'} - {album} [{year}]"
         song_name = f"{str(song_pos).zfill(2)}. {track_name}.m4a" if self.add_numbers else f"{track_name}.m4a"
 
-        album_path = os.path.join("Downloads", folder_name)
-        song_path = os.path.join("Downloads", folder_name, song_name)
+        album_path = os.path.join(self.output_dir, folder_name)
+        song_path = os.path.join(self.output_dir, folder_name, song_name)
 
         try:
             os.makedirs(album_path)

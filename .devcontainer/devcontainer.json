@@ -5,6 +5,13 @@
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/python:1": {}
   },
+  "forwardPorts": [5000],
+  "portsAttributes": {
+    "5000": {
+      "label": "jiosaavn-dl Web App",
+      "onAutoForward": "notify"
+    }
+  },
   "customizations": {
     "vscode": {
       "settings": {

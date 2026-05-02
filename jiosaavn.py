@@ -242,7 +242,7 @@ class Jiosaavn:
             print(f"Downloading : {song_name}...")
 
             # checking if the song is available in the region, if yes then proceed to download else prompt the unavailability
-            if 'media_preview_url' in song_json:
+            if 'encrypted_media_url' in song_json:
                 cdnURL: str = self.getCdnURL(song_json["encrypted_media_url"])
                 # fix cdn url
                 cdnURL = cdnURL.replace('web', 'aac', 1)

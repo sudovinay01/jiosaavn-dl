@@ -17,6 +17,7 @@
 
         :root {
             --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
             --bg-card: rgba(255, 255, 255, 0.04);
             --bg-card-hover: rgba(255, 255, 255, 0.06);
             --bg-input: rgba(255, 255, 255, 0.06);
@@ -42,6 +43,21 @@
             --radius-xl: 28px;
         }
 
+        [data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(0, 0, 0, 0.03);
+            --bg-card-hover: rgba(0, 0, 0, 0.05);
+            --bg-input: rgba(0, 0, 0, 0.04);
+            --bg-input-focus: rgba(0, 0, 0, 0.06);
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --text-primary: #1a1a1f;
+            --text-secondary: #4b4b5a;
+            --text-muted: #7a7a8a;
+            --accent-start: #6366f1;
+            --accent-end: #0ea5e9;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-primary);
@@ -51,8 +67,9 @@
             align-items: center;
             justify-content: center;
             padding: 24px;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         /* Animated gradient orbs */
@@ -60,97 +77,57 @@
             position: fixed;
             border-radius: 50%;
             filter: blur(100px);
-            opacity: 0.3;
+            opacity: 0.2;
             pointer-events: none;
             animation: float 20s ease-in-out infinite;
+            z-index: 0;
         }
 
-        .orb--1 {
-            width: 500px;
-            height: 500px;
-            background: var(--accent-start);
-            top: -15%;
-            left: -10%;
-            animation-delay: 0s;
-        }
-
-        .orb--2 {
-            width: 400px;
-            height: 400px;
-            background: var(--accent-end);
-            bottom: -15%;
-            right: -10%;
-            animation-delay: -7s;
-        }
-
-        .orb--3 {
-            width: 300px;
-            height: 300px;
-            background: #ec4899;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.15;
-            animation-delay: -14s;
-        }
+        .orb--1 { width: 500px; height: 500px; background: var(--accent-start); top: -15%; left: -10%; }
+        .orb--2 { width: 400px; height: 400px; background: var(--accent-end); bottom: -15%; right: -10%; animation-delay: -7s; }
+        .orb--3 { width: 300px; height: 300px; background: #ec4899; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.1; animation-delay: -14s; }
 
         @keyframes float {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(30px, -40px) scale(1.05); }
-            50% { transform: translate(-20px, 20px) scale(0.95); }
-            75% { transform: translate(40px, 30px) scale(1.03); }
+            50% { transform: translate(20px, -20px) scale(1.05); }
         }
 
         .container {
             width: 100%;
-            max-width: 520px;
+            max-width: 600px;
             position: relative;
             z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
 
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 36px;
-        }
-
-        .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .logo-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
-            border-radius: var(--radius-sm);
+        .header { text-align: center; margin-bottom: 12px; position: relative; }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
+        .theme-toggle:hover { background: var(--bg-card-hover); transform: scale(1.05); }
 
-        .logo-text {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3); }
+        .logo-text { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+        .subtitle { color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
 
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 1.5;
-        }
-
-        /* Card */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
@@ -158,323 +135,98 @@
             padding: 32px;
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            transition: background 0.3s ease;
-        }
-
-        .card:hover {
-            background: var(--bg-card-hover);
-        }
-
-        /* Form */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 16px;
-            transition: color 0.2s ease;
-            pointer-events: none;
-        }
-
-        .url-input {
-            width: 100%;
-            padding: 14px 16px 14px 44px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.25s ease;
-        }
-
-        .url-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .url-input:focus {
-            background: var(--bg-input-focus);
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
-        }
-
-        .url-input:focus ~ .input-icon {
-            color: var(--accent-start);
-        }
-
-        /* Options */
-        .options {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .option input[type="checkbox"] {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            border-radius: 5px;
-            border: 1.5px solid var(--border-subtle);
-            background: var(--bg-input);
-            cursor: pointer;
-            position: relative;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .option input[type="checkbox"]:checked {
-            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
-            border-color: transparent;
-        }
-
-        .option input[type="checkbox"]:checked::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .option span {
-            font-size: 13px;
-            color: var(--text-secondary);
-            transition: color 0.2s ease;
-        }
-
-        .option:hover span {
-            color: var(--text-primary);
-        }
-
-        /* Submit button */
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--accent-start), var(--accent-end));
-            border: none;
-            border-radius: var(--radius-md);
-            color: white;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.2px;
         }
 
-        .submit-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, var(--accent-hover-start), var(--accent-hover-end));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+        /* Input Group */
+        .input-group { display: flex; gap: 12px; margin-bottom: 20px; }
+        .input-wrapper { position: relative; flex: 1; }
+        .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
+        .url-input { width: 100%; padding: 14px 16px 14px 44px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary); font-size: 14px; outline: none; transition: all 0.2s ease; }
+        .url-input:focus { background: var(--bg-input-focus); border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        
+        .btn-action { padding: 0 20px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-secondary); font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px; }
+        .btn-action:hover { background: var(--bg-input-focus); color: var(--text-primary); }
 
-        .submit-btn:hover:not(:disabled)::before {
-            opacity: 1;
-        }
+        .options { display: flex; gap: 16px; margin-bottom: 24px; }
+        .option { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 13px; color: var(--text-secondary); }
+        .option input { accent-color: var(--accent-start); }
 
-        .submit-btn:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 24px rgba(139, 92, 246, 0.35);
-        }
+        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); border: none; border-radius: var(--radius-md); color: white; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .submit-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3); }
+        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        .submit-btn:active:not(:disabled) {
-            transform: translateY(0);
-        }
+        /* Preview Area */
+        #previewArea { margin-top: 24px; display: none; animation: slideUp 0.3s ease; }
+        .preview-card { display: flex; gap: 20px; background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; position: relative; }
+        .preview-image { width: 120px; height: 120px; border-radius: var(--radius-md); object-fit: cover; }
+        .preview-info { flex: 1; min-width: 0; }
+        .preview-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .preview-meta { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+        .track-list { font-size: 12px; color: var(--text-muted); max-height: 100px; overflow-y: auto; }
+        .track-item { padding: 4px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 
-        .submit-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
+        /* Progress Area */
+        #progressArea { margin-top: 24px; display: none; }
+        .progress-container { background: var(--bg-input); border-radius: 10px; height: 8px; overflow: hidden; margin: 12px 0; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--accent-start), var(--accent-end)); width: 0%; transition: width 0.3s ease; }
+        .progress-text { font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; }
 
-        .btn-content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+        /* History Area */
+        #historyArea { margin-top: 12px; }
+        .history-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        .history-list { display: flex; flex-direction: column; gap: 8px; }
+        .history-item { display: flex; align-items: center; gap: 12px; background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 10px 16px; border-radius: var(--radius-md); font-size: 13px; transition: all 0.2s ease; cursor: pointer; }
+        .history-item:hover { background: var(--bg-card-hover); transform: translateX(4px); }
+        .history-icon { font-size: 16px; color: var(--accent-start); }
+        .history-info { flex: 1; min-width: 0; }
+        .history-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .history-date { font-size: 11px; color: var(--text-muted); }
 
-        .spinner {
-            display: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
+        /* Spinner */
+        .spinner { width: 20px; height: 20px; border: 2px solid rgba(255, 255, 255, 0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .submit-btn.loading .spinner {
-            display: block;
-        }
+        /* Message */
+        .message { margin-top: 16px; padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13px; display: none; }
+        .message.show { display: block; }
+        .message--error { background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); }
+        .message--success { background: var(--success-bg); border: 1px solid var(--success-border); color: var(--success-text); }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Messages */
-        .message {
-            margin-top: 16px;
-            padding: 12px 16px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            line-height: 1.5;
-            display: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        .message.show {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-        }
-
-        .message--error {
-            background: var(--error-bg);
-            border: 1px solid var(--error-border);
-            color: var(--error-text);
-        }
-
-        .message--success {
-            background: var(--success-bg);
-            border: 1px solid var(--success-border);
-            color: var(--success-text);
-        }
-
-        .message-icon {
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .footer a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .footer a:hover {
-            color: var(--accent-start);
-        }
-
-        /* Supported formats hint */
-        .formats {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 12px;
-            flex-wrap: wrap;
-        }
-
-        .format-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border-subtle);
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        /* Responsive */
         @media (max-width: 480px) {
-            .card {
-                padding: 24px 20px;
-                border-radius: var(--radius-lg);
-            }
-
-            .options {
-                flex-direction: column;
-                gap: 12px;
-            }
-
-            .orb--1 { width: 300px; height: 300px; }
-            .orb--2 { width: 250px; height: 250px; }
-            .orb--3 { width: 200px; height: 200px; }
+            .card { padding: 24px; }
+            .preview-card { flex-direction: column; align-items: center; text-align: center; }
+            .input-group { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <!-- Animated background orbs -->
     <div class="orb orb--1"></div>
     <div class="orb orb--2"></div>
     <div class="orb orb--3"></div>
 
     <div class="container">
         <header class="header">
+            <button class="theme-toggle" id="themeToggle" title="Toggle Theme">🌓</button>
             <div class="logo">
                 <div class="logo-icon">♪</div>
                 <span class="logo-text">jiosaavn-dl</span>
             </div>
-            <p class="subtitle">Download songs, albums & playlists from JioSaavn<br>in 320kbps AAC with full metadata & lyrics</p>
+            <p class="subtitle">High quality 320kbps AAC downloader with full metadata</p>
         </header>
 
         <div class="card">
             <form id="downloadForm">
-                <div class="form-group">
-                    <label class="form-label" for="urlInput">JioSaavn URL</label>
+                <div class="input-group">
                     <div class="input-wrapper">
-                        <input
-                            type="url"
-                            id="urlInput"
-                            class="url-input"
-                            placeholder="https://www.jiosaavn.com/song/..."
-                            required
-                            autocomplete="off"
-                            spellcheck="false"
-                        >
+                        <input type="url" id="urlInput" class="url-input" placeholder="Paste JioSaavn link here..." required autocomplete="off">
                         <span class="input-icon">🔗</span>
                     </div>
+                    <button type="button" class="btn-action" id="pasteBtn" title="Paste from clipboard">
+                        <span>📋</span> Paste
+                    </button>
                 </div>
 
                 <div class="options">
@@ -484,25 +236,51 @@
                     </label>
                     <label class="option">
                         <input type="checkbox" id="downloadCover">
-                        <span>Include cover art file</span>
+                        <span>Include cover.jpg</span>
                     </label>
                 </div>
 
                 <button type="submit" class="submit-btn" id="submitBtn">
-                    <span class="btn-content">
-                        <span class="spinner"></span>
-                        <span id="btnText">Download</span>
-                    </span>
+                    <span class="spinner" id="btnSpinner"></span>
+                    <span id="btnText">Preview & Download</span>
                 </button>
             </form>
 
-            <div class="message message--error" id="errorMsg">
-                <span class="message-icon">⚠</span>
-                <span id="errorText"></span>
+            <!-- Preview Area -->
+            <div id="previewArea">
+                <div class="preview-card">
+                    <img src="" alt="Cover" class="preview-image" id="previewImg">
+                    <div class="preview-info">
+                        <h3 class="preview-title" id="previewTitle"></h3>
+                        <p class="preview-meta" id="previewMeta"></p>
+                        <div class="track-list" id="trackList"></div>
+                    </div>
+                </div>
+                <button class="submit-btn" id="confirmBtn" style="margin-top: 16px;">
+                    Download Now
+                </button>
             </div>
-            <div class="message message--success" id="successMsg">
-                <span class="message-icon">✓</span>
-                <span id="successText"></span>
+
+            <!-- Progress Area -->
+            <div id="progressArea">
+                <div class="progress-text">
+                    <span id="progressMsg">Preparing...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+            </div>
+
+            <div class="message message--error" id="errorMsg"></div>
+            <div class="message message--success" id="successMsg"></div>
+        </div>
+
+        <!-- History Area -->
+        <div id="historyArea">
+            <h4 class="history-title">Recent Downloads</h4>
+            <div class="history-list" id="historyList">
+                <p style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 20px;">Your download history is empty</p>
             </div>
         </div>
 
@@ -523,19 +301,60 @@
         const urlInput = document.getElementById('urlInput');
         const submitBtn = document.getElementById('submitBtn');
         const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
         const errorMsg = document.getElementById('errorMsg');
-        const errorText = document.getElementById('errorText');
         const successMsg = document.getElementById('successMsg');
-        const successText = document.getElementById('successText');
+        const pasteBtn = document.getElementById('pasteBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        
+        const previewArea = document.getElementById('previewArea');
+        const previewImg = document.getElementById('previewImg');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewMeta = document.getElementById('previewMeta');
+        const trackList = document.getElementById('trackList');
+        const confirmBtn = document.getElementById('confirmBtn');
+        
+        const progressArea = document.getElementById('progressArea');
+        const progressMsg = document.getElementById('progressMsg');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressBar = document.getElementById('progressBar');
+        
+        const historyList = document.getElementById('historyList');
+
+        let currentPreviewData = null;
+
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Paste Button
+        pasteBtn.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                urlInput.value = text;
+                hideMessages();
+            } catch (err) {
+                console.error('Failed to read clipboard', err);
+            }
+        });
 
         function showError(msg) {
-            errorText.textContent = msg;
+            errorMsg.textContent = msg;
             errorMsg.classList.add('show');
             successMsg.classList.remove('show');
+            progressArea.style.display = 'none';
         }
 
         function showSuccess(msg) {
-            successText.textContent = msg;
+            successMsg.textContent = msg;
             successMsg.classList.add('show');
             errorMsg.classList.remove('show');
         }
@@ -545,91 +364,157 @@
             successMsg.classList.remove('show');
         }
 
-        function setLoading(isLoading) {
+        function setBtnLoading(isLoading, text = 'Processing...') {
             submitBtn.disabled = isLoading;
-            urlInput.disabled = isLoading;
-            if (isLoading) {
-                submitBtn.classList.add('loading');
-                btnText.textContent = 'Downloading...';
-            } else {
-                submitBtn.classList.remove('loading');
-                btnText.textContent = 'Download';
-            }
+            btnSpinner.style.display = isLoading ? 'block' : 'none';
+            btnText.textContent = text;
         }
 
+        // Preview Logic
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            hideMessages();
-
             const url = urlInput.value.trim();
-            if (!url) {
-                showError('Please enter a URL.');
-                return;
-            }
-
-            // Basic client-side validation
             if (!url.includes('jiosaavn.com')) {
-                showError('Please enter a valid JioSaavn URL.');
+                showError('Please enter a valid JioSaavn URL');
                 return;
             }
 
-            setLoading(true);
+            hideMessages();
+            previewArea.style.display = 'none';
+            progressArea.style.display = 'none';
+            setBtnLoading(true, 'Fetching metadata...');
 
             try {
-                const response = await fetch('/download', {
+                const res = await fetch('/preview', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        url: url,
-                        addNumbers: document.getElementById('addNumbers').checked,
-                        downloadCover: document.getElementById('downloadCover').checked,
-                    }),
+                    body: JSON.stringify({ url })
                 });
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Failed to fetch preview');
 
-                if (!response.ok) {
-                    const data = await response.json();
-                    showError(data.error || 'An unexpected error occurred.');
-                    return;
-                }
+                currentPreviewData = data;
+                previewImg.src = data.image;
+                previewTitle.textContent = data.title;
+                previewMeta.textContent = `${data.artists} • ${data.year || ''} • ${data.total_tracks} track(s)`;
+                
+                trackList.innerHTML = data.tracks.map((t, i) => `
+                    <div class="track-item">${i+1}. ${t.title} - ${t.artists}</div>
+                `).join('');
 
-                // Get filename from Content-Disposition header
-                const disposition = response.headers.get('Content-Disposition');
-                let filename = 'jiosaavn-dl.zip';
-                if (disposition) {
-                    const match = disposition.match(/filename\*?=(?:UTF-8''|")?(.*?)(?:"|;|$)/i);
-                    if (match) {
-                        filename = decodeURIComponent(match[1]);
-                    }
-                }
-
-                // Download the file
-                const blob = await response.blob();
-                const downloadUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = downloadUrl;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(downloadUrl);
-
-                const type = response.headers.get('Content-Type');
-                if (type && type.includes('audio')) {
-                    showSuccess(`Track downloaded successfully!`);
-                } else {
-                    showSuccess(`Download complete! Check your downloads folder.`);
-                }
-
+                previewArea.style.display = 'block';
+                form.style.display = 'none';
             } catch (err) {
-                showError('Network error. Please try again.');
-                console.error(err);
+                showError(err.message);
             } finally {
-                setLoading(false);
+                setBtnLoading(false, 'Preview & Download');
             }
         });
 
-        // Clear messages on new input
-        urlInput.addEventListener('input', hideMessages);
+        // Download Logic
+        confirmBtn.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            const addNumbers = document.getElementById('addNumbers').checked;
+            const downloadCover = document.getElementById('downloadCover').checked;
+
+            previewArea.style.display = 'none';
+            progressArea.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressPercent.textContent = '0%';
+            progressMsg.textContent = 'Starting download...';
+
+            try {
+                const res = await fetch('/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, addNumbers, downloadCover })
+                });
+                const { taskId, error } = await res.json();
+                if (error) throw new Error(error);
+
+                // Start listening to progress
+                const eventSource = new EventSource(`/progress/${taskId}`);
+                
+                eventSource.onmessage = (e) => {
+                    const data = JSON.parse(e.data);
+                    
+                    if (data.status === 'downloading') {
+                        const percent = data.total ? Math.round((data.current / data.total) * 100) : 0;
+                        progressBar.style.width = `${percent}%`;
+                        progressPercent.textContent = `${percent}%`;
+                        progressMsg.textContent = data.message;
+                    } else if (data.status === 'done') {
+                        eventSource.close();
+                        progressMsg.textContent = 'Preparing file for download...';
+                        window.location.href = `/result/${taskId}`;
+                        showSuccess('Download started!');
+                        addToHistory(currentPreviewData.title, currentPreviewData.type);
+                        resetUI();
+                    } else if (data.status === 'error') {
+                        eventSource.close();
+                        showError(data.message);
+                        resetUI();
+                    }
+                };
+
+                eventSource.onerror = () => {
+                    eventSource.close();
+                    showError('Lost connection to server progress');
+                    resetUI();
+                };
+
+            } catch (err) {
+                showError(err.message);
+                resetUI();
+            }
+        });
+
+        function resetUI() {
+            setTimeout(() => {
+                form.style.display = 'block';
+                progressArea.style.display = 'none';
+                previewArea.style.display = 'none';
+            }, 3000);
+        }
+
+        // History Logic
+        function addToHistory(name, type) {
+            const history = JSON.parse(localStorage.getItem('dl_history') || '[]');
+            history.unshift({ name, type, date: new Date().toLocaleString() });
+            const limitedHistory = history.slice(0, 5);
+            localStorage.setItem('dl_history', JSON.stringify(limitedHistory));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const history = JSON.parse(localStorage.getItem('dl_history') || '[]');
+            if (history.length === 0) return;
+
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <span class="history-icon">${item.type === 'song' ? '🎵' : '💿'}</span>
+                    <div class="history-info">
+                        <div class="history-name">${item.name}</div>
+                        <div class="history-date">${item.date}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initial history render
+        renderHistory();
+
+        // Drag & Drop
+        document.addEventListener('dragover', (e) => e.preventDefault());
+        document.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const url = e.dataTransfer.getData('text');
+            if (url && url.includes('jiosaavn.com')) {
+                urlInput.value = url;
+                hideMessages();
+            }
+        });
     </script>
 </body>
 </html>

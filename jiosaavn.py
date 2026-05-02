@@ -41,11 +41,81 @@ def clear() -> None:
 
 
 class Jiosaavn:
-    def __init__(self, add_numbers=False, download_cover=False, output_dir="Downloads") -> None:
+    def __init__(self, add_numbers=False, download_cover=False, output_dir="Downloads", progress_callback=None) -> None:
         self.session = requests.Session()
         self.add_numbers = add_numbers
         self.download_cover = download_cover
         self.output_dir = output_dir
+        self.progress_callback = progress_callback
+
+    def _report_progress(self, message, current=0, total=0):
+        """Report progress to callback if set."""
+        if self.progress_callback:
+            self.progress_callback(message, current, total)
+
+    # Metadata-only methods (no download) for preview
+    def getTrackInfo(self, song_id):
+        """Fetch track metadata without downloading."""
+        metadata = self.session.get(song_api.format(song_id)).text
+        metadata = json.loads(json_rx.search(metadata).group(1))
+        song_json = metadata[f'{list(metadata.keys())[0]}']
+        return {
+            'type': 'song',
+            'title': unescape(song_json.get('song', '')),
+            'album': unescape(song_json.get('album', '')),
+            'artists': unescape(song_json.get('primary_artists', '')),
+            'year': str(song_json.get('year', '')),
+            'image': song_json.get('image', '').replace('150x150', '500x500'),
+            'language': song_json.get('language', '').title(),
+            'has_lyrics': song_json.get('has_lyrics', 'false') == 'true',
+            'tracks': [{
+                'title': unescape(song_json.get('song', '')),
+                'artists': unescape(song_json.get('primary_artists', '')),
+                'duration': song_json.get('duration', '0'),
+            }],
+            'total_tracks': 1,
+        }
+
+    def getAlbumInfo(self, album_id):
+        """Fetch album metadata without downloading."""
+        album_json = self.session.get(album_api.format(album_id)).text
+        album_json = json.loads(json_rx.search(album_json).group(1))
+        tracks = []
+        for song in album_json.get('songs', []):
+            tracks.append({
+                'title': unescape(song.get('song', '')),
+                'artists': unescape(song.get('primary_artists', '')),
+                'duration': song.get('duration', '0'),
+            })
+        return {
+            'type': 'album',
+            'title': unescape(album_json.get('title', '')),
+            'artists': album_json.get('primary_artists', ''),
+            'year': str(album_json.get('year', '')),
+            'image': album_json.get('image', '').replace('150x150', '500x500'),
+            'language': album_json.get('language', '').title(),
+            'tracks': tracks,
+            'total_tracks': len(tracks),
+        }
+
+    def getPlaylistInfo(self, playlist_id):
+        """Fetch playlist metadata without downloading."""
+        playlist_json = self.session.get(playlist_api.format(playlist_id)).text
+        playlist_json = json.loads(json_rx.search(playlist_json).group(1))
+        tracks = []
+        for song in playlist_json.get('songs', []):
+            tracks.append({
+                'title': unescape(song.get('song', '')),
+                'artists': unescape(song.get('primary_artists', '')),
+                'duration': song.get('duration', '0'),
+            })
+        return {
+            'type': 'playlist',
+            'title': playlist_json.get('listname', ''),
+            'image': playlist_json.get('image', '').replace('150x150', '500x500'),
+            'tracks': tracks,
+            'total_tracks': int(playlist_json.get('list_count', 0)),
+        }
 
     # Tags metadata to a track
     def tagger(self, json, song_path, album_artist, album_path, pos=1, total=1):
@@ -109,6 +179,7 @@ class Jiosaavn:
                     Year             : {year}\n\
                     Number of tracks : {total_tracks}\n"
         print(album_info)
+        self._report_progress(f"Processing album: {album_name}", 0, total_tracks)
 
         song_pos = 1
         for song in album_json['songs']:
@@ -153,6 +224,7 @@ class Jiosaavn:
                     Year           : {song_json['year']}\n"
 
         print(song_info)
+        self._report_progress(f"Downloading: {track_name}", song_pos, total_tracks)
 
         # checking if the cover already exists - always download for tagging
         cover_path = os.path.join(album_path, "cover.jpg")
@@ -165,6 +237,7 @@ class Jiosaavn:
         # checking if the song already exists in the directory
         if (os.path.exists(song_path)):
             print(f"{song_name} already downloaded.")
+            self._report_progress(f"Already downloaded: {track_name}", song_pos, total_tracks)
         else:
             print(f"Downloading : {song_name}...")
 
@@ -177,6 +250,7 @@ class Jiosaavn:
                 with open(song_path, "wb") as f:
                     f.write(self.session.get(cdnURL).content)
 
+                self._report_progress(f"Tagging: {track_name}", song_pos, total_tracks)
                 print("Tagging metadata...")
 
                 self.tagger(song_json, song_path, album_artist,
@@ -188,8 +262,10 @@ class Jiosaavn:
                     if os.path.exists(cover_path):
                         os.remove(cover_path)
 
+                self._report_progress(f"Done: {track_name}", song_pos, total_tracks)
                 print("Done.")
             else:
+                self._report_progress(f"Unavailable in your region: {track_name}", song_pos, total_tracks)
                 print("\nTrack unavailable in your region!")
 
     def getCdnURL(self, encurl: str):
@@ -220,6 +296,7 @@ class Jiosaavn:
                             Playlist name    : {playlist_name}\n\
                             Number of tracks : {total_tracks}\n"
         print(playlist_info)
+        self._report_progress(f"Processing playlist: {playlist_name}", 0, total_tracks)
 
         song_pos = 1
         for song in playlist_json['songs']:

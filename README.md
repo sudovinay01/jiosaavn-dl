@@ -6,8 +6,33 @@ Music, Album and Playlist downloader for JioSaavn
 
 - Downloads tracks, albums and playlists in maximum available quality (320kbps AAC in M4A container).
 - Automatically tags the tracks with all the necessary metadata, lyrics and cover art.
+- Features a beautiful, responsive dark/light mode Web Interface (GUI) and a Command Line Interface (CLI).
 
-## How to use?
+## How to use the Web App (GUI)
+
+The web app provides a beautiful, user-friendly interface to preview and download songs.
+
+1. Ensure you have installed the requirements: `pip install -r requirements.txt`
+2. Run the Flask application:
+```bash
+python app.py
+```
+3. Open your browser and navigate to `http://localhost:5000`
+4. The application is secured with a password. By default, the password is **`secret`**.
+
+### Setting a Custom Password
+To change the password or run in production, set the `APP_PASSWORD` environment variable:
+```bash
+# Linux / macOS
+export APP_PASSWORD="your_secure_password"
+python app.py
+
+# Windows (Command Prompt)
+set APP_PASSWORD=your_secure_password
+python app.py
+```
+
+## How to use the CLI
 
 Make sure you have [python](https://www.python.org/ "python") installed in your system.
 

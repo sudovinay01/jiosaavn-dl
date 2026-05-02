@@ -46,8 +46,17 @@ jiosaavn-dl/
 
 | Route | Method | Purpose |
 |-------|--------|---------|
-| `/` | GET | Serves the web UI |
-| `/download` | POST | Accepts a JioSaavn URL, downloads tracks, returns .m4a or .zip |
+| `/login` | GET/POST | Password authentication page |
+| `/logout` | GET | Clears session |
+| `/` | GET | Serves the main web UI (Protected) |
+| `/preview` | POST | Fetches metadata (Protected) |
+| `/start` | POST | Starts a download task (Protected) |
+| `/progress/<id>`| GET | SSE stream for real-time progress (Protected) |
+| `/result/<id>` | GET | Serves the downloaded .m4a or .zip (Protected) |
+
+**Environment Variables:**
+- `APP_PASSWORD`: Password required to login to the web UI (default: `"secret"`).
+- `FLASK_SECRET_KEY`: Used for session management.
 
 **Download flow:**
 1. Validate URL → create `TemporaryDirectory` → process tracks

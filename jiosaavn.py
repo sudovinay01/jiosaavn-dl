@@ -16,7 +16,8 @@ album_api = "https://www.jiosaavn.com/api.php?__call=webapi.get&token={}&type=al
 playlist_api = "https://www.jiosaavn.com/api.php?__call=webapi.get&token={}&type=playlist&_format=json&n=1000"
 lyrics_api = "https://www.jiosaavn.com/api.php?__call=lyrics.getLyrics&ctx=web6dot0&api_version=4&_format=json&_marker=0%3F_marker%3D0&lyrics_id="
 album_song_rx = re.compile("https://www\.jiosaavn\.com/(album|song)/.+?/(.+)")
-playlist_rx = re.compile("https://www\.jiosaavn\.com/(s/playlist|featured)/.+/(.+)")
+playlist_rx = re.compile(
+    "https://www\.jiosaavn\.com/(s/playlist|featured)/.+/(.+)")
 json_rx = re.compile("({.+})")
 
 logo = """
@@ -40,8 +41,10 @@ def clear() -> None:
 
 
 class Jiosaavn:
-    def __init__(self) -> None:
+    def __init__(self, add_numbers=False, download_cover=False) -> None:
         self.session = requests.Session()
+        self.add_numbers = add_numbers
+        self.download_cover = download_cover
 
     # Tags metadata to a track
     def tagger(self, json, song_path, album_artist, album_path, pos=1, total=1):
@@ -61,7 +64,7 @@ class Jiosaavn:
         audio["trkn"] = [(pos, total)]
 
         # if the song has lyrics then tag else skip
-        if(json["has_lyrics"] == "true"):
+        if (json["has_lyrics"] == "true"):
             lyric_json = self.session.get(lyrics_api + json["id"]).json()
             audio["\xa9lyr"] = lyric_json["lyrics"].replace("<br>", "\n")
 
@@ -131,7 +134,7 @@ class Jiosaavn:
             folder_name = isPlaylist
         else:
             folder_name = f"{primary_artists if primary_artists.count(',') < 2 else 'Various Artists'} - {album} [{year}]"
-        song_name = f"{str(song_pos).zfill(2)}. {track_name}.m4a"
+        song_name = f"{str(song_pos).zfill(2)}. {track_name}.m4a" if self.add_numbers else f"{track_name}.m4a"
 
         album_path = os.path.join("Downloads", folder_name)
         song_path = os.path.join("Downloads", folder_name, song_name)
@@ -150,15 +153,16 @@ class Jiosaavn:
 
         print(song_info)
 
-        # checking if the cover already exists
-        if not os.path.exists(os.path.join(album_path, "cover.jpg")) or isPlaylist:
+        # checking if the cover already exists - always download for tagging
+        cover_path = os.path.join(album_path, "cover.jpg")
+        if not os.path.exists(cover_path) or isPlaylist:
             print("\nDownloading the cover...")
-            with open(os.path.join(album_path, "cover.jpg"), "wb") as f:
+            with open(cover_path, "wb") as f:
                 f.write(self.session.get(
                     song_json["image"].replace("150", "500")).content)
 
         # checking if the song already exists in the directory
-        if(os.path.exists(song_path)):
+        if (os.path.exists(song_path)):
             print(f"{song_name} already downloaded.")
         else:
             print(f"Downloading : {song_name}...")
@@ -166,8 +170,8 @@ class Jiosaavn:
             # checking if the song is available in the region, if yes then proceed to download else prompt the unavailability
             if 'media_preview_url' in song_json:
                 cdnURL: str = self.getCdnURL(song_json["encrypted_media_url"])
-                # fix cdn url 
-                cdnURL = cdnURL.replace('web','aac', 1)
+                # fix cdn url
+                cdnURL = cdnURL.replace('web', 'aac', 1)
                 # download the song
                 with open(song_path, "wb") as f:
                     f.write(self.session.get(cdnURL).content)
@@ -176,6 +180,13 @@ class Jiosaavn:
 
                 self.tagger(song_json, song_path, album_artist,
                             album_path, song_pos, total_tracks)
+
+                # Delete cover if not needed
+                if not self.download_cover:
+                    cover_path = os.path.join(album_path, "cover.jpg")
+                    if os.path.exists(cover_path):
+                        os.remove(cover_path)
+
                 print("Done.")
             else:
                 print("\nTrack unavailable in your region!")
@@ -190,9 +201,9 @@ class Jiosaavn:
             'ctx': 'web6dot0',
             '_marker': '0',
         }
-        response = self.session.get('https://www.jiosaavn.com/api.php', params=params)
+        response = self.session.get(
+            'https://www.jiosaavn.com/api.php', params=params)
         return response.json()["auth_url"]
-
 
     def processPlaylist(self, playlist_id):
         # json
@@ -213,7 +224,7 @@ class Jiosaavn:
         for song in playlist_json['songs']:
             song_id = album_song_rx.search(song['perma_url']).group(2)
             self.processTrack(song_id, None, song_pos,
-                            total_tracks, playlist_path)
+                              total_tracks, playlist_path)
             song_pos += 1
 
 
@@ -223,15 +234,22 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(
         description="Downloads songs/albums/playlist from JioSaavn")
-    parser.add_argument("url", help="Song/album/playlist URL")
+    parser.add_argument("url", nargs='?',
+                        default="link to a song/album/playlist",
+                        help="Song/album/playlist URL (optional)")
+    parser.add_argument("--with-numbers", action="store_true",
+                        help="Enable track numbering in filenames")
+    parser.add_argument("--with-cover", action="store_true",
+                        help="Download cover images")
     args = parser.parse_args()
 
     url = args.url
 
-    jiosaavn = Jiosaavn()
+    jiosaavn = Jiosaavn(add_numbers=args.with_numbers,
+                        download_cover=args.with_cover)
 
     # handles album URL
-    if("/album/" in url or "/song/" in url):
+    if ("/album/" in url or "/song/" in url):
 
         kind, id_ = album_song_rx.search(url).groups()
 
@@ -244,6 +262,3 @@ if __name__ == "__main__":
         jiosaavn.processPlaylist(playlist_id)
     else:
         print("Please enter a valid link!")
-
-
-

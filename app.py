@@ -10,14 +10,47 @@ import tempfile
 import threading
 import json as json_module
 from queue import Queue, Empty
-from flask import Flask, render_template, request, send_file, jsonify, Response
+from flask import Flask, render_template, request, send_file, jsonify, Response, session, redirect, url_for
 from jiosaavn import Jiosaavn, album_song_rx, playlist_rx
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", os.urandom(24))
+APP_PASSWORD = os.environ.get("APP_PASSWORD", "secret")
 
 # Task storage for background downloads
 tasks = {}
 tasks_lock = threading.Lock()
+
+
+@app.before_request
+def require_login():
+    if request.endpoint in ('login', 'static'):
+        return
+    if not session.get('logged_in'):
+        # For API requests, return 401 instead of redirect
+        if request.is_json or request.path.startswith(('/preview', '/start', '/progress', '/result')):
+            if request.method == 'GET' and not request.is_json:
+                return redirect(url_for('login'))
+            return jsonify({"error": "Unauthorized"}), 401
+        return redirect(url_for('login'))
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        if request.form.get("password") == APP_PASSWORD:
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+        else:
+            return render_template("login.html", error="Invalid password")
+    return render_template("login.html")
+
+
+@app.route("/logout")
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
 
 
 @app.route("/")

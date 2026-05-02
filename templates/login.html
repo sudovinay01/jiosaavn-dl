@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — jiosaavn-dl</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(255, 255, 255, 0.04);
+            --bg-card-hover: rgba(255, 255, 255, 0.06);
+            --bg-input: rgba(255, 255, 255, 0.06);
+            --bg-input-focus: rgba(255, 255, 255, 0.09);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-focus: rgba(139, 92, 246, 0.5);
+            --text-primary: #f0f0f5;
+            --text-secondary: #8a8a9a;
+            --text-muted: #55556a;
+            --accent-start: #8b5cf6;
+            --accent-end: #06b6d4;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --error-border: rgba(239, 68, 68, 0.3);
+            --error-text: #fca5a5;
+            --radius-md: 14px;
+            --radius-xl: 28px;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(0, 0, 0, 0.03);
+            --bg-card-hover: rgba(0, 0, 0, 0.05);
+            --bg-input: rgba(0, 0, 0, 0.04);
+            --bg-input-focus: rgba(0, 0, 0, 0.06);
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --text-primary: #1a1a1f;
+            --text-secondary: #4b4b5a;
+            --text-muted: #7a7a8a;
+            --accent-start: #6366f1;
+            --accent-end: #0ea5e9;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow-x: hidden;
+            position: relative;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.2;
+            pointer-events: none;
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        .orb--1 { width: 400px; height: 400px; background: var(--accent-start); top: 10%; left: 10%; }
+        .orb--2 { width: 300px; height: 300px; background: var(--accent-end); bottom: 10%; right: 10%; animation-delay: -7s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.05); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .header { text-align: center; margin-bottom: 12px; }
+        .logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; color: white; box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3); }
+        .logo-text { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
+        .password-input { width: 100%; padding: 14px 16px 14px 44px; background: var(--bg-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary); font-size: 14px; outline: none; transition: all 0.2s ease; }
+        .password-input:focus { background: var(--bg-input-focus); border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        
+        .submit-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent-start), var(--accent-end)); border: none; border-radius: var(--radius-md); color: white; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; }
+        .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3); }
+
+        .error-message { margin-bottom: 20px; padding: 12px 16px; border-radius: var(--radius-md); font-size: 13px; background: var(--error-bg); border: 1px solid var(--error-border); color: var(--error-text); text-align: center; }
+
+    </style>
+</head>
+<body>
+    <div class="orb orb--1"></div>
+    <div class="orb orb--2"></div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">♪</div>
+                <span class="logo-text">jiosaavn-dl</span>
+            </div>
+            <p style="color: var(--text-secondary); font-size: 14px;">Please enter the password to continue</p>
+        </header>
+
+        <div class="card">
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="/login">
+                <div class="input-group">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" name="password" class="password-input" placeholder="Password" required autofocus>
+                </div>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Apply theme from localStorage if exists
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+</body>
+</html>

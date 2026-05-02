@@ -449,7 +449,7 @@
                         progressMsg.textContent = 'Preparing file for download...';
                         window.location.href = `/result/${taskId}`;
                         showSuccess('Download started!');
-                        addToHistory(currentPreviewData.title, currentPreviewData.type);
+                        addToHistory(currentPreviewData.title, currentPreviewData.type, url);
                         resetUI();
                     } else if (data.status === 'error') {
                         eventSource.close();
@@ -479,10 +479,12 @@
         }
 
         // History Logic
-        function addToHistory(name, type) {
+        function addToHistory(name, type, url) {
             const history = JSON.parse(localStorage.getItem('dl_history') || '[]');
-            history.unshift({ name, type, date: new Date().toLocaleString() });
-            const limitedHistory = history.slice(0, 5);
+            // Avoid duplicates in history
+            const filtered = history.filter(item => item.url !== url);
+            filtered.unshift({ name, type, url, date: new Date().toLocaleString() });
+            const limitedHistory = filtered.slice(0, 5);
             localStorage.setItem('dl_history', JSON.stringify(limitedHistory));
             renderHistory();
         }
@@ -492,15 +494,27 @@
             if (history.length === 0) return;
 
             historyList.innerHTML = history.map(item => `
-                <div class="history-item">
+                <div class="history-item" onclick="redownload('${item.url}')">
                     <span class="history-icon">${item.type === 'song' ? '🎵' : '💿'}</span>
                     <div class="history-info">
                         <div class="history-name">${item.name}</div>
                         <div class="history-date">${item.date}</div>
                     </div>
+                    <button class="btn-action" style="padding: 6px 10px; border-radius: 8px;" title="Redownload">
+                        ⬇️
+                    </button>
                 </div>
             `).join('');
         }
+
+        window.redownload = (url) => {
+            urlInput.value = url;
+            hideMessages();
+            // Trigger form submission for preview
+            form.dispatchEvent(new Event('submit'));
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
         // Initial history render
         renderHistory();
